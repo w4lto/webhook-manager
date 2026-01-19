@@ -3,9 +3,7 @@
 
 A professional Python CLI to expose local ports with a custom hostname, ideal for testing webhooks and callbacks during development. Includes an interactive TUI (Text User Interface).
 
-This version can also expose your local endpoint to the public internet (no account required) using **localtunnel** via **npm/npx**.
-
-![Webhook Tunnel Demo](https://via.placeholder.com/800x400?text=Webhook+Tunnel+TUI)
+This version can also expose your local endpoint to the public internet (no account required) using **localtunnel** via **npm/npx
 
 ## ✨ Key Features
 
