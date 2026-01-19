@@ -109,9 +109,3 @@ curl -v http://127.0.0.1:8001/readyz -H "Host: teste.localhost"
 ```bash
 curl -v <external_url>/readyz
 ```
-
-## 📚 Documentation
-
-## 📄 License
-
-MIT
