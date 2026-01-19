@@ -1,7 +1,4 @@
 # Webhook Tunnel
-
-[![PyPI version](https://badge.fury.io/py/webhook-tunnel.svg)](https://badge.fury.io/py/webhook-tunnel)
-[![Python Version](https://img.shields.io/pypi/pyversions/webhook-tunnel.svg)](https://pypi.org/project/webhook-tunnel/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A professional Python CLI to expose local ports with a custom hostname, ideal for testing webhooks and callbacks during development. Includes an interactive TUI (Text User Interface).
@@ -27,17 +24,17 @@ This version can also expose your local endpoint to the public internet (no acco
 ### From PyPI (recommended)
 
 ```bash
-pip install webhook-tunnel
+pip install webhook-mannager
 ```
 
 ### With extras
 
 ```bash
 # Full installation with an example webhook server
-pip install webhook-tunnel[webhook-server]
+pip install webhook-mannager[webhook-server]
 
 # Development extras
-pip install webhook-tunnel[dev]
+pip install webhook-mannager[dev]
 ```
 
 ## 🚀 Quick Start
@@ -76,7 +73,7 @@ This will:
 If `npx` is not available, the tool can automatically download a portable Node.js LTS runtime into:
 
 ```
-~/.webhook-tunnel/tools/node
+~/.webhook-mannager/tools/node
 ```
 
 ## 🖥️ TUI (Interactive Interface)

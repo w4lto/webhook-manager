@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "webhook-tunnel"
+name = "webhook-mannager"
 version = "1.0.0"
-description = "🚇 Expose local ports with custom DNS for webhook testing - TUI interface"
+description = "Expose local ports with custom DNS for webhook testing - TUI interface"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
