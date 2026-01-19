@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Script de instalação do Webhook Tunnel
 set -e
 
 echo "╔════════════════════════════════════════╗"
@@ -13,9 +12,8 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Verifica Python
 echo -e "${CYAN}Checking Python installation...${NC}"
 if ! command -v python3 &> /dev/null; then
     echo -e "${RED}❌ Python 3 not found. Please install Python 3.8+${NC}"
@@ -25,7 +23,6 @@ fi
 PYTHON_VERSION=$(python3 --version 2>&1 | awk '{print $2}')
 echo -e "${GREEN}✅ Python found: ${PYTHON_VERSION}${NC}"
 
-# Verifica versão do Python
 REQUIRED_VERSION="3.8"
 CURRENT_VERSION=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:2])))')
 
@@ -34,7 +31,6 @@ if [ "$(printf '%s\n' "$REQUIRED_VERSION" "$CURRENT_VERSION" | sort -V | head -n
     exit 1
 fi
 
-# Verifica pip
 echo -e "${CYAN}Checking pip installation...${NC}"
 if ! command -v pip3 &> /dev/null; then
     echo -e "${RED}❌ pip3 not found. Installing pip...${NC}"
@@ -42,7 +38,6 @@ if ! command -v pip3 &> /dev/null; then
 fi
 echo -e "${GREEN}✅ pip found${NC}"
 
-# Verifica socat
 echo -e "${CYAN}Checking socat installation...${NC}"
 if ! command -v socat &> /dev/null; then
     echo -e "${YELLOW}⚠️  socat not found. Attempting to install...${NC}"
@@ -92,13 +87,10 @@ fi
 echo ""
 echo -e "${CYAN}Installing webhook-tunnel...${NC}"
 
-# Método de instalação
 if [ -f "setup.py" ]; then
-    # Instalação local (desenvolvimento)
     echo "Installing from local source..."
     pip3 install -e .
 else
-    # Instalação do PyPI
     echo "Installing from PyPI..."
     pip3 install webhook-tunnel
 fi
@@ -106,7 +98,6 @@ fi
 echo ""
 echo -e "${CYAN}Verifying installation...${NC}"
 
-# Verifica se os comandos estão disponíveis
 COMMANDS=("tunnel" "tunnel-tui" "tunnel-server")
 ALL_FOUND=true
 
@@ -127,7 +118,7 @@ if [ "$ALL_FOUND" = true ]; then
     echo ""
     echo -e "${CYAN}Available commands:${NC}"
     echo "  • tunnel         - CLI interface"
-    echo "  • tunnel-tui     - Interactive TUI (k9s-style)"
+    echo "  • tunnel-tui     - Interactive TUI"
     echo "  • tunnel-server  - Example webhook server"
     echo ""
     echo -e "${CYAN}Quick start:${NC}"

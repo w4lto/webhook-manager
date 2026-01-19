@@ -14,7 +14,7 @@ setup(
     version="1.0.0",
     author="Webhook Tunnel Contributors",
     author_email="contact@example.com",
-    description="🚇 Expose local ports with custom DNS for webhook testing - K9s-style TUI interface",
+    description="🚇 Expose local ports with custom DNS for webhook testing - TUI interface",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/yourusername/webhook-tunnel",
@@ -77,7 +77,6 @@ setup(
         "testing",
         "port-forwarding",
         "dns",
-        "tui",
-        "k9s",
+        "tui"
     ],
 )

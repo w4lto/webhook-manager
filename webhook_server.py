@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """
-Exemplo de servidor webhook para testar o tunnel
-Execute: python webhook_server.py
-Depois: tunnel start webhook 5000
+
 """
 
 from flask import Flask, request, jsonify
@@ -11,21 +9,19 @@ import json
 
 app = Flask(__name__)
 
-# Armazena os últimos webhooks recebidos
 webhooks_received = []
 
 @app.route('/')
 def home():
     return '''
     <h1>🎣 Webhook Receiver</h1>
-    <p>Servidor rodando e pronto para receber webhooks!</p>
+    <p>Server running!</p>
     <p><a href="/webhooks">Ver webhooks recebidos</a></p>
     <p><a href="/test">Testar webhook</a></p>
     '''
 
 @app.route('/webhook', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH'])
 def webhook():
-    """Endpoint principal para receber webhooks"""
     
     webhook_data = {
         'timestamp': datetime.now().isoformat(),
@@ -49,14 +45,12 @@ def webhook():
         except:
             webhook_data['body'] = '<binary data>'
     
-    # Armazena (mantém apenas os últimos 50)
     webhooks_received.append(webhook_data)
     if len(webhooks_received) > 50:
         webhooks_received.pop(0)
     
-    # Log no console
     print(f"\n{'='*60}")
-    print(f"🎣 Webhook recebido: {request.method} {request.path}")
+    print(f"🎣 Webhook recived: {request.method} {request.path}")
     print(f"⏰ Timestamp: {webhook_data['timestamp']}")
     print(f"📋 Headers: {json.dumps(dict(request.headers), indent=2)}")
     if webhook_data.get('json'):
@@ -68,12 +62,11 @@ def webhook():
     return jsonify({
         'status': 'received',
         'timestamp': webhook_data['timestamp'],
-        'message': 'Webhook processado com sucesso!'
+        'message': 'Webhook successfully processed!'
     }), 200
 
 @app.route('/webhooks', methods=['GET'])
 def list_webhooks():
-    """Lista todos os webhooks recebidos"""
     return jsonify({
         'total': len(webhooks_received),
         'webhooks': webhooks_received
@@ -81,13 +74,11 @@ def list_webhooks():
 
 @app.route('/webhooks/clear', methods=['POST'])
 def clear_webhooks():
-    """Limpa a lista de webhooks"""
     webhooks_received.clear()
-    return jsonify({'status': 'cleared', 'message': 'Todos os webhooks foram removidos'})
+    return jsonify({'status': 'cleared', 'message': 'All webhooks removed'})
 
 @app.route('/test', methods=['GET'])
 def test():
-    """Página de teste para enviar webhooks"""
     return '''
     <!DOCTYPE html>
     <html>
@@ -136,7 +127,7 @@ def test():
         </form>
         
         <h2>Resposta:</h2>
-        <pre id="response">Nenhuma resposta ainda...</pre>
+        <pre id="response">No response recived yet...</pre>
         
         <script>
             document.getElementById('webhookForm').addEventListener('submit', async (e) => {
@@ -168,7 +159,6 @@ def test():
 
 @app.route('/health', methods=['GET'])
 def health():
-    """Health check endpoint"""
     return jsonify({
         'status': 'healthy',
         'timestamp': datetime.now().isoformat(),
@@ -176,12 +166,12 @@ def health():
     })
 
 if __name__ == '__main__':
-    print("🚀 Iniciando servidor webhook...")
-    print("📍 Acesse: http://localhost:5000")
-    print("🎣 Endpoint webhook: http://localhost:5000/webhook")
-    print("📋 Ver webhooks: http://localhost:5000/webhooks")
-    print("🧪 Testar: http://localhost:5000/test")
-    print("\n💡 Não esqueça de expor com: tunnel start webhook 5000")
+    print("🚀 Starting webhook server...")
+    print("📍 Local address: http://localhost:5000")
+    print("🎣 Webhook endpoint: http://localhost:5000/webhook")
+    print("📋 List webhooks: http://localhost:5000/webhooks")
+    print("🧪 Try out: http://localhost:5000/test")
+    print("\n💡 Expose tunnel with: tunnel start webhook 5000")
     print()
     
     app.run(debug=True, port=5000, host='0.0.0.0')

@@ -1,21 +1,17 @@
 #!/usr/bin/env python3
-"""
-Versão avançada do tunnel com integração nginx
-"""
+
 import os
 import subprocess
 from pathlib import Path
 from tunnel_cli import TunnelManager, click
 
 class NginxTunnelManager(TunnelManager):
-    """Gerenciador de túneis com suporte nginx"""
     
     def __init__(self):
         super().__init__()
         self.nginx_available = self.check_nginx()
     
     def check_nginx(self):
-        """Verifica se nginx está disponível"""
         try:
             subprocess.run(['nginx', '-v'], 
                          capture_output=True, 
@@ -25,7 +21,6 @@ class NginxTunnelManager(TunnelManager):
             return False
     
     def create_nginx_config(self, tunnel_info):
-        """Cria configuração nginx para o túnel"""
         if not self.nginx_available:
             return None
         
@@ -35,7 +30,7 @@ class NginxTunnelManager(TunnelManager):
         full_domain = f"{subdomain}.{domain}"
         
         config_content = f"""
-# Configuração automática para {tunnel_info['name']}
+# Automatic configuration for {tunnel_info['name']}
 server {{
     listen 80;
     server_name {full_domain};
@@ -70,23 +65,18 @@ server {{
         return config_path
     
     def enable_nginx_site(self, config_path, name):
-        """Habilita o site no nginx"""
         try:
-            # Copia para sites-available
             dest = f"/etc/nginx/sites-available/tunnel-{name}"
             subprocess.run(['sudo', 'cp', str(config_path), dest], 
                          check=True)
             
-            # Cria link simbólico
             link = f"/etc/nginx/sites-enabled/tunnel-{name}"
             subprocess.run(['sudo', 'ln', '-sf', dest, link], 
                          check=True)
             
-            # Testa configuração
             subprocess.run(['sudo', 'nginx', '-t'], 
                          check=True)
             
-            # Recarrega nginx
             subprocess.run(['sudo', 'systemctl', 'reload', 'nginx'], 
                          check=True)
             
@@ -95,7 +85,6 @@ server {{
             return False
     
     def disable_nginx_site(self, name):
-        """Desabilita o site no nginx"""
         try:
             link = f"/etc/nginx/sites-enabled/tunnel-{name}"
             subprocess.run(['sudo', 'rm', '-f', link], 
@@ -115,7 +104,6 @@ server {{
 
 @click.group()
 def nginx_cli():
-    """Comandos avançados com nginx"""
     pass
 
 
@@ -126,30 +114,29 @@ def nginx_cli():
 @click.option('--nginx/--no-nginx', default=False, 
               help='Criar configuração nginx')
 def create(name, local_port, subdomain, nginx):
-    """Cria túnel com opção de nginx"""
     manager = NginxTunnelManager()
     
     try:
-        click.echo(f"🚀 Criando túnel '{name}'...")
+        click.echo(f"🚀 Creating tunnel '{name}'...")
         tunnel = manager.create_tunnel(name, local_port, subdomain)
         
-        click.echo(click.style("✅ Túnel criado!", fg='green'))
+        click.echo(click.style("✅ Tunnel created!", fg='green'))
         click.echo(f"🔗 URL: {tunnel['public_url']}")
         
         if nginx and manager.nginx_available:
-            click.echo("\n📝 Criando configuração nginx...")
+            click.echo("\n📝 Creating nginx configuration...")
             config_path = manager.create_nginx_config(tunnel)
             
             if config_path:
-                click.echo(f"✅ Configuração criada: {config_path}")
-                click.echo("\n⚠️  Para ativar o nginx, execute:")
+                click.echo(f"✅ Nginx configurarion created: {config_path}")
+                click.echo("\n⚠️  To activate nginx run:")
                 click.echo(f"   sudo cp {config_path} /etc/nginx/sites-available/")
                 click.echo(f"   sudo ln -s /etc/nginx/sites-available/tunnel-{name} /etc/nginx/sites-enabled/")
                 click.echo("   sudo nginx -t")
                 click.echo("   sudo systemctl reload nginx")
         
     except Exception as e:
-        click.echo(click.style(f"❌ Erro: {e}", fg='red'), err=True)
+        click.echo(click.style(f"❌ Error: {e}", fg='red'), err=True)
 
 
 if __name__ == '__main__':

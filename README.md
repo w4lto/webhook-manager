@@ -1,10 +1,10 @@
-# 🚇 Webhook Tunnel
+# Webhook Tunnel
 
 [![PyPI version](https://badge.fury.io/py/webhook-tunnel.svg)](https://badge.fury.io/py/webhook-tunnel)
 [![Python Version](https://img.shields.io/pypi/pyversions/webhook-tunnel.svg)](https://pypi.org/project/webhook-tunnel/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A professional Python CLI to expose local ports with a custom hostname, ideal for testing webhooks and callbacks during development. Includes an interactive, k9s-style TUI (Text User Interface).
+A professional Python CLI to expose local ports with a custom hostname, ideal for testing webhooks and callbacks during development. Includes an interactive TUI (Text User Interface).
 
 This version can also expose your local endpoint to the public internet (no account required) using **localtunnel** via **npm/npx**.
 
@@ -15,7 +15,7 @@ This version can also expose your local endpoint to the public internet (no acco
 - 🚀 **Fast local port exposure**
 - 🌐 **Custom hostname** with subdomains
 - 🌍 **Public internet URL** via npm/npx (**localtunnel**) for webhook testing
-- 💻 **Interactive k9s-style TUI**
+- 💻 **Interactive TUI**
 - 📊 **Real-time monitoring** (CPU, memory, uptime)
 - 🔍 **Built-in log viewer**
 - 🎯 **Multiple tunnels** simultaneously

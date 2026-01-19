@@ -8,7 +8,7 @@ webhook-tunnel/
 │   ├── __init__.py         # Package initialization
 │   ├── manager.py          # Tunnel manager
 │   ├── cli.py              # CLI interface
-│   ├── tui.py              # TUI interface (k9s-style)
+│   ├── tui.py              # TUI interface
 │   └── webhook_server.py   # Example server
 ├── setup.py                 # Legacy packaging
 ├── pyproject.toml          # Modern build metadata (PEP 517)
@@ -96,7 +96,7 @@ After installation, users will have access to:
 
 ```bash
 tunnel          # Traditional CLI
-tunnel-tui      # TUI (k9s-style)
+tunnel-tui      # TUI
 tunnel-server   # Example webhook receiver
 ```
 

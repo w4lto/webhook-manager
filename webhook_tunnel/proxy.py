@@ -6,7 +6,7 @@ project installable via pip on multiple OSes.
 It performs a best-effort TCP forward from a public port to a local port and
 records basic connection events and HTTP request lines (when detected).
 
-Limitations (by design for an MVP):
+Limitations:
 - HTTP logging is best-effort and focuses on the request line/host.
 - It does not aim to be a full-featured reverse proxy (chunking nuances,
   websockets, HTTP/2, etc.). For webhook/callback testing over HTTP/1.1 this
@@ -114,14 +114,12 @@ async def handle_client(
     peer_str = f"{peer[0]}:{peer[1]}" if isinstance(peer, tuple) else str(peer)
     logger.write(f"conn accepted from {peer_str}")
 
-    # Best-effort: peek initial bytes to log HTTP request line.
     initial = b""
     try:
         initial = await asyncio.wait_for(client_reader.readuntil(b"\r\n\r\n"), timeout=http_peek_timeout)
     except asyncio.IncompleteReadError as e:
         initial = e.partial
     except asyncio.LimitOverrunError:
-        # header too large; skip http logging
         initial = b""
     except asyncio.TimeoutError:
         initial = b""

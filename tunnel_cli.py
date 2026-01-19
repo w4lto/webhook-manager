@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-Webhook Tunnel CLI - Exponha portas locais com DNS customizado
-"""
+
 import os
 import sys
 import json
@@ -13,14 +11,12 @@ import time
 from pathlib import Path
 from datetime import datetime
 
-# Configurações globais
 CONFIG_DIR = Path.home() / '.webhook-tunnel'
 CONFIG_FILE = CONFIG_DIR / 'config.json'
 TUNNELS_FILE = CONFIG_DIR / 'tunnels.json'
 LOG_DIR = CONFIG_DIR / 'logs'
 
 class TunnelManager:
-    """Gerenciador de túneis"""
     
     def __init__(self):
         self.ensure_config_dir()
@@ -28,7 +24,6 @@ class TunnelManager:
         self.tunnels = self.load_tunnels()
     
     def ensure_config_dir(self):
-        """Garante que os diretórios de configuração existem"""
         CONFIG_DIR.mkdir(exist_ok=True)
         LOG_DIR.mkdir(exist_ok=True)
         
@@ -42,56 +37,45 @@ class TunnelManager:
             self.save_json(CONFIG_FILE, default_config)
     
     def load_config(self):
-        """Carrega configuração"""
         return self.load_json(CONFIG_FILE)
     
     def load_tunnels(self):
-        """Carrega túneis ativos"""
         if TUNNELS_FILE.exists():
             return self.load_json(TUNNELS_FILE)
         return {}
     
     def save_tunnels(self):
-        """Salva túneis ativos"""
         self.save_json(TUNNELS_FILE, self.tunnels)
     
     @staticmethod
     def load_json(filepath):
-        """Carrega arquivo JSON"""
         with open(filepath, 'r') as f:
             return json.load(f)
     
     @staticmethod
     def save_json(filepath, data):
-        """Salva arquivo JSON"""
         with open(filepath, 'w') as f:
             json.dump(data, f, indent=2)
     
     def is_port_available(self, port):
-        """Verifica se a porta está disponível"""
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         result = sock.connect_ex(('127.0.0.1', port))
         sock.close()
         return result != 0
     
     def create_tunnel(self, name, local_port, subdomain=None, public_port=None):
-        """Cria um novo túnel"""
         if name in self.tunnels:
-            raise ValueError(f"Túnel '{name}' já existe")
+            raise ValueError(f"Tunnel '{name}' already exists")
         
-        # Verifica se a porta local está em uso
         if self.is_port_available(local_port):
-            raise ValueError(f"Porta local {local_port} não está em uso. Inicie seu serviço primeiro.")
+            raise ValueError(f"Local port {local_port} is not in use. Restart your service first")
         
-        # Define subdomínio
         if not subdomain:
             subdomain = name
         
-        # Define porta pública
         if not public_port:
             public_port = self.find_available_port()
         
-        # Cria URL público
         domain = self.config.get('domain', 'localhost')
         public_url = f"http://{subdomain}.{domain}:{public_port}"
         
@@ -107,7 +91,6 @@ class TunnelManager:
             'pid': None
         }
         
-        # Inicia o proxy
         pid = self.start_proxy(tunnel_info)
         tunnel_info['pid'] = pid
         
@@ -117,30 +100,25 @@ class TunnelManager:
         return tunnel_info
     
     def find_available_port(self, start=8000, end=9000):
-        """Encontra uma porta disponível"""
         for port in range(start, end):
             if self.is_port_available(port):
-                # Verifica se não está sendo usada por outro túnel
                 if not any(t.get('public_port') == port for t in self.tunnels.values()):
                     return port
-        raise RuntimeError("Nenhuma porta disponível encontrada")
+        raise RuntimeError("No avaliable local port found")
     
     def start_proxy(self, tunnel_info):
-        """Inicia um proxy simples usando socat"""
         local_port = tunnel_info['local_port']
         public_port = tunnel_info['public_port']
         name = tunnel_info['name']
         
         log_file = LOG_DIR / f"{name}.log"
         
-        # Usa socat para fazer port forwarding
         cmd = [
             'socat',
             f'TCP-LISTEN:{public_port},fork,reuseaddr',
             f'TCP:127.0.0.1:{local_port}'
         ]
         
-        # Inicia o processo em background
         with open(log_file, 'w') as log:
             process = subprocess.Popen(
                 cmd,
@@ -149,19 +127,16 @@ class TunnelManager:
                 start_new_session=True
             )
         
-        # Aguarda um pouco para garantir que iniciou
         time.sleep(0.5)
         
-        # Verifica se o processo ainda está rodando
         if process.poll() is not None:
-            raise RuntimeError(f"Falha ao iniciar proxy. Veja o log: {log_file}")
+            raise RuntimeError(f"Failed to start proxy. Check log file: {log_file}")
         
         return process.pid
     
     def stop_tunnel(self, name):
-        """Para um túnel"""
         if name not in self.tunnels:
-            raise ValueError(f"Túnel '{name}' não encontrado")
+            raise ValueError(f"Tunnel '{name}' not found")
         
         tunnel = self.tunnels[name]
         pid = tunnel.get('pid')
@@ -170,7 +145,6 @@ class TunnelManager:
             try:
                 os.kill(pid, signal.SIGTERM)
                 time.sleep(0.5)
-                # Força se ainda estiver rodando
                 try:
                     os.kill(pid, signal.SIGKILL)
                 except ProcessLookupError:
@@ -182,18 +156,15 @@ class TunnelManager:
         self.save_tunnels()
     
     def list_tunnels(self):
-        """Lista todos os túneis"""
         return self.tunnels
     
     def cleanup_dead_tunnels(self):
-        """Remove túneis com processos mortos"""
         dead_tunnels = []
         
         for name, tunnel in self.tunnels.items():
             pid = tunnel.get('pid')
             if pid:
                 try:
-                    # Tenta enviar sinal 0 para verificar se o processo existe
                     os.kill(pid, 0)
                 except ProcessLookupError:
                     dead_tunnels.append(name)
@@ -211,7 +182,7 @@ class TunnelManager:
 @click.version_option(version='1.0.0')
 def cli():
     """
-    🚇 Webhook Tunnel - Exponha portas locais com DNS customizado
+    Webhook Tunnel - Exponha portas locais com DNS customizado
     
     Ferramenta para desenvolvedores testarem webhooks e callbacks facilmente.
     """
@@ -221,8 +192,8 @@ def cli():
 @cli.command()
 @click.argument('name')
 @click.argument('local_port', type=int)
-@click.option('--subdomain', '-s', help='Subdomínio customizado')
-@click.option('--public-port', '-p', type=int, help='Porta pública customizada')
+@click.option('--subdomain', '-s', help='Custom subdomain')
+@click.option('--public-port', '-p', type=int, help='Custom public port')
 def start(name, local_port, subdomain, public_port):
     """
     Inicia um novo túnel
@@ -232,24 +203,24 @@ def start(name, local_port, subdomain, public_port):
     manager = TunnelManager()
     
     try:
-        click.echo(f"🚀 Iniciando túnel '{name}'...")
+        click.echo(f"🚀 Startting tunnel '{name}'...")
         tunnel = manager.create_tunnel(name, local_port, subdomain, public_port)
         
-        click.echo(click.style("✅ Túnel criado com sucesso!", fg='green', bold=True))
+        click.echo(click.style("✅ Tunnel successfully created!", fg='green', bold=True))
         click.echo()
-        click.echo(f"📍 Nome: {tunnel['name']}")
-        click.echo(f"🔗 URL Pública: {click.style(tunnel['public_url'], fg='cyan', bold=True)}")
-        click.echo(f"🏠 Porta Local: {tunnel['local_port']}")
-        click.echo(f"🌐 Porta Pública: {tunnel['public_port']}")
-        click.echo(f"📝 Subdomínio: {tunnel['subdomain']}.{tunnel['domain']}")
+        click.echo(f"📍 Name: {tunnel['name']}")
+        click.echo(f"🔗 Public URL: {click.style(tunnel['public_url'], fg='cyan', bold=True)}")
+        click.echo(f"🏠 Local port: {tunnel['local_port']}")
+        click.echo(f"🌐 Public port: {tunnel['public_port']}")
+        click.echo(f"📝 Subdomain: {tunnel['subdomain']}.{tunnel['domain']}")
         click.echo()
-        click.echo("💡 Use 'tunnel stop {}' para parar o túnel".format(name))
+        click.echo("💡 Use 'tunnel stop {}' to stop tunnel".format(name))
         
     except ValueError as e:
-        click.echo(click.style(f"❌ Erro: {e}", fg='red'), err=True)
+        click.echo(click.style(f"❌ Error: {e}", fg='red'), err=True)
         sys.exit(1)
     except Exception as e:
-        click.echo(click.style(f"❌ Erro inesperado: {e}", fg='red'), err=True)
+        click.echo(click.style(f"❌ Unexpected error: {e}", fg='red'), err=True)
         sys.exit(1)
 
 
@@ -264,9 +235,9 @@ def stop(name):
     manager = TunnelManager()
     
     try:
-        click.echo(f"🛑 Parando túnel '{name}'...")
+        click.echo(f"🛑 Stopping tunnel '{name}'...")
         manager.stop_tunnel(name)
-        click.echo(click.style(f"✅ Túnel '{name}' parado com sucesso!", fg='green'))
+        click.echo(click.style(f"✅ Tunnel '{name}' successfully stopped!", fg='green'))
     except ValueError as e:
         click.echo(click.style(f"❌ Erro: {e}", fg='red'), err=True)
         sys.exit(1)
@@ -280,38 +251,37 @@ def list_tunnels():
     # Limpa túneis mortos
     dead = manager.cleanup_dead_tunnels()
     if dead:
-        click.echo(f"🧹 Removidos {len(dead)} túnel(is) inativo(s)")
+        click.echo(f"🧹 Removed {len(dead)} idle tunnels")
         click.echo()
     
     tunnels = manager.list_tunnels()
     
     if not tunnels:
-        click.echo("📭 Nenhum túnel ativo")
+        click.echo("📭 No idle tunnels found")
         return
     
-    click.echo(click.style("🚇 Túneis Ativos:", fg='blue', bold=True))
+    click.echo(click.style("🚇 Running tunnels:", fg='blue', bold=True))
     click.echo()
     
     for name, tunnel in tunnels.items():
         click.echo(f"  {click.style('●', fg='green')} {click.style(name, bold=True)}")
         click.echo(f"    URL: {click.style(tunnel['public_url'], fg='cyan')}")
-        click.echo(f"    Local: localhost:{tunnel['local_port']} → Público: :{tunnel['public_port']}")
+        click.echo(f"    Local: localhost:{tunnel['local_port']} → Public: :{tunnel['public_port']}")
         click.echo(f"    PID: {tunnel.get('pid', 'N/A')}")
         click.echo()
 
 
 @cli.command()
 def cleanup():
-    """Remove todos os túneis inativos"""
     manager = TunnelManager()
     dead = manager.cleanup_dead_tunnels()
     
     if dead:
-        click.echo(click.style(f"✅ Removidos {len(dead)} túnel(is) inativo(s)", fg='green'))
+        click.echo(click.style(f"✅ Removed {len(dead)} idle tunnels", fg='green'))
         for name in dead:
             click.echo(f"  • {name}")
     else:
-        click.echo("✨ Nenhum túnel inativo encontrado")
+        click.echo("✨ No idle tunnel found")
 
 
 @cli.command()
@@ -321,10 +291,10 @@ def stopall():
     tunnels = list(manager.list_tunnels().keys())
     
     if not tunnels:
-        click.echo("📭 Nenhum túnel ativo")
+        click.echo("📭 No running tunnels")
         return
     
-    click.echo(f"🛑 Parando {len(tunnels)} túnel(is)...")
+    click.echo(f"🛑 Stopping {len(tunnels)} tunnels...")
     
     for name in tunnels:
         try:
@@ -333,11 +303,11 @@ def stopall():
         except Exception as e:
             click.echo(f"  ❌ {name}: {e}")
     
-    click.echo(click.style("\n✅ Todos os túneis foram parados!", fg='green'))
+    click.echo(click.style("\n✅ All tunels stopped!", fg='green'))
 
 
 @cli.command()
-@click.option('--domain', '-d', help='Domínio base (ex: localhost)')
+@click.option('--domain', '-d', help='Base domain (ex: localhost)')
 def config(domain):
     """Configura opções globais"""
     manager = TunnelManager()
@@ -345,9 +315,9 @@ def config(domain):
     if domain:
         manager.config['domain'] = domain
         manager.save_json(CONFIG_FILE, manager.config)
-        click.echo(click.style(f"✅ Domínio configurado: {domain}", fg='green'))
+        click.echo(click.style(f"✅ Domain set: {domain}", fg='green'))
     else:
-        click.echo("⚙️  Configuração Atual:")
+        click.echo("⚙️  Current config:")
         click.echo()
         for key, value in manager.config.items():
             click.echo(f"  {key}: {value}")
@@ -360,16 +330,16 @@ def logs(name):
     manager = TunnelManager()
     
     if name not in manager.tunnels:
-        click.echo(click.style(f"❌ Túnel '{name}' não encontrado", fg='red'), err=True)
+        click.echo(click.style(f"❌ Tunnel '{name}' not found", fg='red'), err=True)
         sys.exit(1)
     
     log_file = LOG_DIR / f"{name}.log"
     
     if not log_file.exists():
-        click.echo(f"📭 Nenhum log disponível para '{name}'")
+        click.echo(f"📭 No log avaliable for '{name}'")
         return
     
-    click.echo(f"📋 Logs de '{name}':")
+    click.echo(f"📋 Logs : '{name}':")
     click.echo("─" * 60)
     
     with open(log_file, 'r') as f:
@@ -377,7 +347,7 @@ def logs(name):
         if content.strip():
             click.echo(content)
         else:
-            click.echo("(vazio)")
+            click.echo("(empty)")
 
 
 if __name__ == '__main__':
