@@ -5,13 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "webhook-tunnel"
 version = "1.0.0"
-description = "🚇 Expose local ports with custom DNS for webhook testing - K9s-style TUI interface"
+description = "🚇 Expose local ports with custom DNS for webhook testing - TUI interface"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
-keywords = ["webhook", "tunnel", "ngrok", "localhost", "development", "testing", "port-forwarding", "dns", "tui", "k9s"]
+keywords = ["webhook", "tunnel", "ngrok", "localhost", "development", "testing", "port-forwarding", "dns", "tui"]
 authors = [
-    {name = "Webhook Tunnel Contributors", email = "contact@example.com"}
+    {name = "Joao Pedro Albergaria de Castro", email = "jpbrasil373@gmail.com"}
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -49,10 +49,10 @@ webhook-server = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/webhook-tunnel"
-Documentation = "https://github.com/yourusername/webhook-tunnel#readme"
-Repository = "https://github.com/yourusername/webhook-tunnel"
-"Bug Tracker" = "https://github.com/yourusername/webhook-tunnel/issues"
+Homepage = "https://github.com/w4lto/webhook-manager"
+Documentation = "https://github.com/w4lto/webhook-manager/blob/main/README.md"
+Repository = "https://github.com/w4lto/webhook-manager"
+"Bug Tracker" = "https://github.com/w4lto/webhook-manager/issues"
 
 [project.scripts]
 tunnel = "webhook_tunnel.cli:main"

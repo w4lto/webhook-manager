@@ -117,9 +117,6 @@ curl -v <external_url>/readyz
 
 ## 📚 Documentation
 
-- [Quick Start](QUICKSTART.md)
-- [Publishing to PyPI](PUBLISHING.md)
-
 ## 📄 License
 
 MIT
