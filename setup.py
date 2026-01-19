@@ -11,17 +11,17 @@ long_description = (this_directory / "README.md").read_text(encoding='utf-8')
 
 setup(
     name="webhook-tunnel",
-    version="1.0.0",
-    author="Webhook Tunnel Contributors",
-    author_email="contact@example.com",
+    version="1.0.1",
+    author="Joao Pedro Albergaria de Castro",
+    author_email="jpbrasil373@gmail.com",
     description="🚇 Expose local ports with custom DNS for webhook testing - TUI interface",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/webhook-tunnel",
+    url="https://github.com/w4lto/webhook-manager",
     project_urls={
-        "Bug Tracker": "https://github.com/yourusername/webhook-tunnel/issues",
-        "Documentation": "https://github.com/yourusername/webhook-tunnel#readme",
-        "Source Code": "https://github.com/yourusername/webhook-tunnel",
+        "Bug Tracker": "https://github.com/w4lto/webhook-manager/issues",
+        "Documentation": "https://github.com/w4lto/webhook-manager#readme",
+        "Source Code": "https://github.com/w4lto/webhook-manager",
     },
     packages=find_packages(),
     classifiers=[
